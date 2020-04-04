@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+</head>
+
+<body>
+  <%- include('./common/navbar') %>
+  <div class="container my-5">
+    <h1>Jy的直播间</h1>
+
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <div id="messages" class="mb-4"
+          style="height: 300px; overflow-y: auto; border: 1px solid #000;border-radius: 5px; padding: 10px;">
+
+          <!-- <div class="my-4 d-flex">
+                        <div class="mr-2">
+                          <small class="text-black-50">张三：</small>
+                        </div>
+                        <div>
+                          hello
+                        </div>
+                      </div> -->
+
+          <!-- <div class="my-4 d-flex justify-content-end">
+                        <div>
+                          hello
+                        </div>
+                      </div> -->
+
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mx-auto d-flex">
+        <input id="value" type="text" class="form-control mr-2">
+        <button id="btn" class="btn btn-primary">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="/assets/lib/socket.io.js"></script>
+  <!-- <script src="/js/chatroom.js"></script> -->
+  <script>
+    $(function () {
+      let socket = io()
+      socket.emit('setName', '<%= username %>')
+
+      socket.on('message', data => {
+        if (data.username == '<%= username %>') {
+          $('#messages').append(`
+                <div class="my-4 d-flex justify-content-end">
+                    <div>我：${data.message}</div>
+                </div>
+            `)
+        } else {
+          $('#messages').append(`
+            <div class="my-4 d-flex">
+                <div class="mr-2"> <small class="text-black-50">${data.username}</small></div>
+                <div>${data.message}</div>
+            </div>
+            `)
+        }
+
+        $('#messages').stop().animate({
+          scrollTop: $('#messages').height() + $('#messages').scrollTop()
+        })
+      })
+
+      $('#btn').click(function () {
+        if(!$('#value').val()) return
+        socket.emit('message', {
+          username: '<%= username %>',
+          message: `${$('#value').val()}`
+        })
+        $('#value').val('')
+      })
+      
+    })
+
+    
+
+    
+  </script>
+</body>
+
+</html>
